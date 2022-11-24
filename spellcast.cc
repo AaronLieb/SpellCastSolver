@@ -3,29 +3,34 @@
 #include "Dictionary.cc"
 
 #define MAXWORDSIZE 14
+#define USEREPLACE true
 namespace rules {
 const int DOUBLE = 0x2;
 const int TRIPLE = 0x4;
 const int MULTI = 0x6;
 }  // namespace rules
 namespace style {
-const std::string color = "\u001b[32m";  // TBD
+const std::string green = "\u001b[32m";  // green
 const std::string bold = "\u001b[1m";
 const std::string black = "\u001b[30m";
 const std::string white_bg = "\u001b[47m";
 const std::string black_bg = "\u001b[40;1m";
 const std::string reset = "\u001b[0m";
+const std::string red = "\u001b[31m";
 }  // namespace style
 
 using Matrix = std::vector<std::string>;
 using Seen = std::set<std::pair<int, int>>;
+using Replacement = std::pair<std::pair<int, int>, char>;
 
 struct Item {
   std::pair<int, int> pos;
   std::string cword;
   Seen visited;
   int value;
-  bool is_multi = false;
+  bool is_multi;
+  bool has_replaced;
+  Replacement replacement;
 };
 
 void printGridWord(const Matrix& lines, const Item& item) {
@@ -33,9 +38,18 @@ void printGridWord(const Matrix& lines, const Item& item) {
     for (int c{}; c < lines[r].size(); ++c) {
       bool is_in_word = item.visited.count({r, c});
       char chr = lines[r][c];
+      std::string color = style::green;
+      Replacement rep = item.replacement;
+
+      if (item.has_replaced &&
+          (rep.first.first == r && rep.first.second == c)) {
+        color = style::red;
+        chr = rep.second;
+      }
+
       std::cout << style::black_bg;
-      std::cout << (is_in_word ? style::color + style::bold : style::black)
-                << chr << " " << style::reset;
+      std::cout << (is_in_word ? color + style::bold : style::black) << chr
+                << " " << style::reset;
     }
     std::cout << "\n";
   }
@@ -55,40 +69,57 @@ void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
   while (!Q.empty()) {
     Item f = Q.front();
     Q.pop();
+    if (f.visited.count(f.pos)) continue;
+
     char to_add = lines[f.pos.first][f.pos.second];
     char flag = flags[f.pos.first][f.pos.second];
-    f.cword += to_add;  // cleaned
-    if (flag == 'X')
+
+    if (USEREPLACE && !f.has_replaced) {
+      for (char chr = 'a'; chr <= 'z'; ++chr) {
+        if (chr == to_add) continue;
+        Item cf = f;
+        cf.cword += chr;
+        cf.replacement = {cf.pos, chr};
+        cf.value -= dictionary.getCharValue(to_add) *
+                    (flags[cf.pos.first][cf.pos.second] - 48);
+        cf.has_replaced = true;
+        Q.push(cf);
+      }
+    }
+
+    if (f.pos != f.replacement.first) f.cword += to_add;  // cleaned
+
+    if (f.cword.size() >= MAXWORDSIZE) continue;
+    if (!dictionary.isPrefix(f.cword)) continue;
+    if (flag == 'X') {
       f.is_multi = true;
-    else {
+      f.value += dictionary.getCharValue(to_add);
+    } else {
       f.value += dictionary.getCharValue(to_add) *
                  (flags[f.pos.first][f.pos.second] - 48);
     }
-
-    if (!dictionary.isPrefix(f.cword)) continue;
-    if (f.cword.size() >= MAXWORDSIZE) continue;
-    if (f.visited.count(f.pos)) continue;
     if (dictionary.contains(f.cword) and found.count(f.cword) == 0 and
         f.cword.size() > 2) {
-      int value = f.value * (f.is_multi ? 2 : 1);
       f.visited.insert(f.pos);
+      f.value <<= f.is_multi;  // mult by 2 (fast lol) fuk u lol
       results.push_back(f);
-      // std::cout << value << " " << f.cword << "\n";
+      f.value >>= f.is_multi;  // divi by 2 (fast lol)
       found.insert(f.cword);
     }
 
     f.visited.insert(f.pos);
     /*  visit neighbors */
     int r, c;
-    std::tie(r, c) = f.pos;  // maybe doesn't workjhk
+    r = f.pos.first;
+    c = f.pos.second;
     for (int nr = r - 1; nr < r + 2; ++nr) {
       if (nr < 0 || nr >= lines.size()) continue;
       for (int nc = c - 1; nc < c + 2; ++nc) {  // gen all pairs
         if (nc < 0 || nc >= lines[0].size()) continue;
-        Q.push({{nr, nc},
-                f.cword,
-                f.visited,
-                f.value});  // pos, cword, {visited}, value, ismulti
+        if (nr == r && nc == c) continue;  // ?
+        Item cf = f;
+        cf.pos = {nr, nc};
+        Q.push(cf);  // pos, cword, {visited}, value, ismulti
       }
     }
   }
@@ -127,11 +158,11 @@ int main() {
   std::sort(begin(results), end(results),
             [](auto a, auto b) { return a.value > b.value; });
 
-  int i = 3;
+  int i = 5;
   for (Item& item : results) {
     std::cout << item.value << " " << item.cword << "\n";
     printGridWord(lines, item);
-    if (!i--) break;
+    if (!--i) break;
     std::cout << "\n";
   }
 
