@@ -2,8 +2,13 @@
 
 #include "PrefixTree.cc"
 
+using Seen = std::set<std::pair<int, int>>;
+using Matrix = std::vector<std::string>;
+
 class Dictionary {
   std::unordered_set<std::string> dict;
+  int values[26] = {1, 4, 5, 3, 1, 5, 3, 4, 1, 7, 6, 3, 4,
+                    2, 1, 4, 8, 4, 2, 4, 5, 5, 7, 4, 8};
 
  public:
   PrefixTree prefix_tree;
@@ -23,6 +28,8 @@ class Dictionary {
   bool isPrefix(const std::string& prefix) {
     return prefix_tree.startsWith(prefix);
   }
+
+  int getCharValue(char c) { return this->values[c - 'a']; }
 };
 
 static Dictionary dictionary("dictionary.txt");
