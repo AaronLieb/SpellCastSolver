@@ -2,8 +2,14 @@
 
 #include "Dictionary.cc"
 
-#define MAXWORDSIZE 14
+#define MAXWORDSIZE 15
+#define REPLACE_COST 10
+#define LONGWORD_BONUS 20
+#define LONGWORD_MIN 8
 #define USEREPLACE true
+// double = '2'
+// triple = '3'
+// multi = 'X'
 namespace rules {
 const int DOUBLE = 0x2;
 const int TRIPLE = 0x4;
@@ -101,9 +107,11 @@ void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
     if (dictionary.contains(f.cword) and found.count(f.cword) == 0 and
         f.cword.size() > 2) {
       f.visited.insert(f.pos);
+      int old_val = f.value;
       f.value <<= f.is_multi;  // mult by 2 (fast lol) fuk u lol
+      f.value += (f.cword.size() >= LONGWORD_MIN) * LONGWORD_BONUS;
       results.push_back(f);
-      f.value >>= f.is_multi;  // divi by 2 (fast lol)
+      f.value = old_val;  // copy magic
       found.insert(f.cword);
     }
 
@@ -155,14 +163,25 @@ int main() {
   std::vector<Item> results;
   bfs(lines, flags, 0, 0, results);
 
-  std::sort(begin(results), end(results),
-            [](auto a, auto b) { return a.value > b.value; });
+  std::sort(begin(results), end(results), [](auto a, auto b) {
+    a.value -= a.has_replaced ? REPLACE_COST : 0;
+    b.value -= b.has_replaced ? REPLACE_COST : 0;
+    return a.value > b.value;
+  });
 
-  int i = 5;
+  int i = 5, max_depth = 10;
+  bool used_non_replacement = false;
   for (Item& item : results) {
     std::cout << item.value << " " << item.cword << "\n";
+    if (item.has_replaced == false) used_non_replacement = true;
     printGridWord(lines, item);
-    if (!--i) break;
+    if (i == 1 && !used_non_replacement) {
+      if (!--max_depth) break;
+      continue;
+    }
+    if (!--i) {
+      break;
+    }
     std::cout << "\n";
   }
 
