@@ -1,9 +1,5 @@
 #include <bits/stdc++.h>
-
 #include "PrefixTree.cc"
-
-using Seen = std::set<std::pair<int, int>>;
-using Matrix = std::vector<std::string>;
 
 class Dictionary {
   std::unordered_set<std::string> dict;
@@ -15,6 +11,7 @@ class Dictionary {
   Dictionary() = delete;
 
   Dictionary(std::string fname) {
+    std::cout << "PARSING DICTIONARY...\n";
     std::ifstream fp(fname);
     std::string word;
     while (fp >> word) {

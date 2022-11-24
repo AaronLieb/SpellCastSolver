@@ -38,15 +38,24 @@ class PrefixTree {  // thanks robot overlords
     node->isWord = true;
   }
 
-  bool search(string word) {
+  TrieNode* search(string word) {
     TrieNode* node = root;
     for (char c : word) {
       if (node->children[c - 'a'] == NULL) {
-        return false;
+        return nullptr;
       }
       node = node->children[c - 'a'];
     }
-    return node->isWord;
+    return node;
+  }
+
+  int children(string word) {
+    TrieNode* f = search(word);
+    int kids = 0;
+    for (int i{}; i < 26; ++i) {
+      if (f->children[i] != nullptr) kids += 1 << i;
+    }
+    return kids;
   }
 
   bool startsWith(string prefix) {

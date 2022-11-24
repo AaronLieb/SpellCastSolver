@@ -1,2 +1,2 @@
 #! /bin/bash
-clang++ -std=c++20 spellcast.cc -g -o sc.out
+clang++ -ferror-limit=1000 -std=c++20 spellcast.cc -g -o sc.out

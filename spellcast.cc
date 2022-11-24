@@ -1,15 +1,16 @@
 #include <bits/stdc++.h>
-
 #include "Dictionary.cc"
 
-#define MAXWORDSIZE 15
+#define MAX_WORD_SIZE 13
+#define MIN_VALUE_FOR_DOUBLE_REPLACEMENT 8
 #define REPLACE_COST 10
+#define MAX_REPLACEMENTS 2
 #define LONGWORD_BONUS 20
 #define LONGWORD_MIN 8
-#define USEREPLACE true
+#define USE_REPLACE true
 #define DOUBLE '2'
 #define TRIPLE '3'
-#define MULTI 'X'
+#define MULTI '$'
 #define DEBUG false
 
 namespace style {
@@ -32,8 +33,7 @@ struct Item {
   Seen visited;
   int value;
   bool is_multi;
-  bool has_replaced;
-  Replacement replacement;
+  std::set<Replacement> replacements;
 };
 
 void printGridWord(const Matrix& lines, const Item& item) {
@@ -42,12 +42,13 @@ void printGridWord(const Matrix& lines, const Item& item) {
       bool is_in_word = item.visited.count({r, c});
       char chr = lines[r][c];
       std::string color = style::green;
-      Replacement rep = item.replacement;
+      std::set<Replacement> reps = item.replacements;
 
-      if (item.has_replaced &&
-          (rep.first.first == r && rep.first.second == c)) {
-        color = style::red;
-        chr = rep.second;
+      for (auto&& rep : reps) {
+        if (rep.first.first == r && rep.first.second == c) {
+          color = style::red;
+          chr = rep.second;
+        }
       }
 
       std::cout << style::black_bg;
@@ -77,22 +78,36 @@ void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
     char to_add = lines[f.pos.first][f.pos.second];
     char flag = flags[f.pos.first][f.pos.second];
 
-    if (USEREPLACE && !f.has_replaced) {
-      for (char chr = 'a'; chr <= 'z'; ++chr) {
-        if (chr == to_add) continue;
-        Item cf = f;
-        cf.cword += chr;
-        cf.replacement = {cf.pos, chr};
-        cf.value -= dictionary.getCharValue(to_add) *
-                    (flags[cf.pos.first][cf.pos.second] - 48);
-        cf.has_replaced = true;
-        Q.push(cf);
+
+    //std::cout << "cword: " << f.cword << std::endl;
+
+    if (USE_REPLACE && f.replacements.size() < MAX_REPLACEMENTS && (f.value > MIN_VALUE_FOR_DOUBLE_REPLACEMENT || f.replacements.size() == 0)) {
+      bool good = true;
+      for (auto&& rep : f.replacements) {
+        if (rep.first == f.pos) good = false;
+      }
+      if (good) {
+        int children = dictionary.prefix_tree.children(f.cword); // bit mask
+        for (char chr = 'a'; chr <= 'z'; ++chr) {
+          if (((1 << (chr-'a')) & children) == 0 || chr == to_add) continue;
+          Item cf = f;
+          cf.cword += chr;
+          cf.replacements.insert({cf.pos, chr});
+          cf.value -= dictionary.getCharValue(to_add) *
+                      (flags[cf.pos.first][cf.pos.second] - 48);
+          Q.push(cf);
+        }   
       }
     }
 
-    if (f.pos != f.replacement.first) f.cword += to_add;  // cleaned
+    bool has_replacements = false;
+    for (auto&& rep : f.replacements) {
+      has_replacements = has_replacements || (f.pos == rep.first);
+    }
+    if (!has_replacements) f.cword += to_add;
 
-    if (f.cword.size() >= MAXWORDSIZE) continue;
+
+    if (f.cword.size() >= MAX_WORD_SIZE) continue;
     if (!dictionary.isPrefix(f.cword)) continue;
     if (flag == 'X') {
       f.is_multi = true;
@@ -136,7 +151,6 @@ int main() {
     Matrix lines;
     Matrix flags(5, "11111");
     std::string line;
-    std::cout << "CALCULATING...\n";
     while (fin >> line) {
       std::string clean = "";
       bool offset = 0;
@@ -146,7 +160,6 @@ int main() {
           offset = 1;
           continue;
         }
-        // 2abyXpt
         clean += line[x];
       }
       lines.push_back(clean);
@@ -161,19 +174,21 @@ int main() {
       }
     }
 
+    std::cout << "CALCULATING...\n";
+
     std::vector<Item> results;
     bfs(lines, flags, 0, 0, results);
 
     std::sort(begin(results), end(results), [](auto a, auto b) {
-      a.value -= a.has_replaced ? REPLACE_COST : 0;
-      b.value -= b.has_replaced ? REPLACE_COST : 0;
+      a.value -= a.replacements.size() * REPLACE_COST;
+      b.value -= b.replacements.size() * REPLACE_COST;
       return a.value > b.value;
     });
 
     int i = 5, max_depth = 100;
     bool used_non_replacement = false;
     for (Item& item : results) {
-      if (item.has_replaced == false) used_non_replacement = true;
+      if (item.replacements.size() == 0) used_non_replacement = true;
       if (i == 1 && !used_non_replacement) {
         if (!--max_depth) break;
         continue;
