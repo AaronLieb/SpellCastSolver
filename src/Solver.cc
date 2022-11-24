@@ -144,7 +144,8 @@ void Solver::start() {
     std::cout << "🛑 Type s to STOP\n";
     std::string resp = "hi";
     std::getline(std::cin, resp);
-    if (resp == "s") break;
+    if (resp == "s") this->running = false;
+    system("clear");  // clear console window
 
   }  // end main while
 }  // end Solver::start

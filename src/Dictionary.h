@@ -35,6 +35,4 @@ class Dictionary {
   int getCharValue(char c) { return this->values[c - 'a']; }
 };
 
-static Dictionary dictionary("dictionary.txt");
-
 #endif
