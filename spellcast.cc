@@ -167,16 +167,16 @@ int main() {
     return a.value > b.value;
   });
 
-  int i = 5, max_depth = 10;
+  int i = 5, max_depth = 100;
   bool used_non_replacement = false;
   for (Item& item : results) {
-    std::cout << item.value << " " << item.cword << "\n";
     if (item.has_replaced == false) used_non_replacement = true;
-    printGridWord(lines, item);
     if (i == 1 && !used_non_replacement) {
       if (!--max_depth) break;
       continue;
     }
+    std::cout << item.value << " " << item.cword << "\n";
+    printGridWord(lines, item);
     if (!--i) {
       break;
     }
