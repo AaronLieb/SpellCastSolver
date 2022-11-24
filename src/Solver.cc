@@ -94,21 +94,6 @@ void Solver::start() {
     for (const Item& item : no_replace) {
       cli::util::printGridWord(lines, item);
     }
-    // int i = 5, max_depth = 100;
-    // bool used_non_replacement = false;
-    // for (Item& item : results) {
-    //   if (item.has_replaced == false) used_non_replacement = true;
-    //   if (i == 1 && !used_non_replacement) {
-    //     if (!--max_depth) break;
-    //     continue;
-    //   }
-    //   std::cout << item.value << " " << item.cword << "\n";
-    //   cli::util::printGridWord(lines, item);
-    //   if (!--i) {
-    //     break;
-    //   }
-    //   std::cout << "\n";
-    // }
 
     cli::endPrompt();
     this->running = cli::getEndResponse();  // type 's' to stop!

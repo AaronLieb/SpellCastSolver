@@ -55,6 +55,8 @@ auto sortByHeuristic(auto& to_sort) {
 }
 
 auto topNWithKReplacements(auto& results, int n, int k) -> auto{
+  int max_depth = 2048;
+
   typename std::decay<decltype(results)>::type topn;
   for (const Item& result : results) {
     /* TO-DO: change has_replaced to replace_count */
@@ -62,6 +64,7 @@ auto topNWithKReplacements(auto& results, int n, int k) -> auto{
       topn.push_back(result);
       if (!--n) break;
     }
+    if (!--max_depth) break;  // fail-safe if no words found with k replaces
   }
   return topn;
 }
