@@ -1,65 +1,7 @@
-#include <bits/stdc++.h>
+#include "Solver.h"
 
-#include "Dictionary.cc"
-
-#define MAXWORDSIZE 15
-#define REPLACE_COST 10
-#define LONGWORD_BONUS 20
-#define LONGWORD_MIN 7
-#define USEREPLACE true
-#define DOUBLE '2'
-#define TRIPLE '3'
-#define MULTI 'X'
-#define DEBUG false
-
-namespace style {
-const std::string green = "\u001b[32m";  // green
-const std::string bold = "\u001b[1m";
-const std::string black = "\u001b[30m";
-const std::string white_bg = "\u001b[47m";
-const std::string black_bg = "\u001b[40;1m";
-const std::string reset = "\u001b[0m";
-const std::string red = "\u001b[31m";
-}  // namespace style
-
-using Matrix = std::vector<std::string>;
-using Seen = std::set<std::pair<int, int>>;
-using Replacement = std::pair<std::pair<int, int>, char>;
-
-struct Item {
-  std::pair<int, int> pos;
-  std::string cword;
-  Seen visited;
-  int value;
-  bool is_multi;
-  bool has_replaced;
-  Replacement replacement;
-};
-
-void printGridWord(const Matrix& lines, const Item& item) {
-  for (int r{}; r < lines.size(); ++r) {
-    for (int c{}; c < lines[r].size(); ++c) {
-      bool is_in_word = item.visited.count({r, c});
-      char chr = lines[r][c];
-      std::string color = style::green;
-      Replacement rep = item.replacement;
-
-      if (item.has_replaced &&
-          (rep.first.first == r && rep.first.second == c)) {
-        color = style::red;
-        chr = rep.second;
-      }
-
-      std::cout << style::black_bg;
-      std::cout << (is_in_word ? color + style::bold : style::black) << chr
-                << " " << style::reset;
-    }
-    std::cout << "\n";
-  }
-}
-
-void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
-         std::vector<Item>& results) {
+void Solver::bfs(const Matrix& lines, const Matrix& flags,
+                 std::vector<Item>& results) {
   static std::unordered_set<std::string> found;
 
   std::queue<Item> Q;
@@ -128,15 +70,23 @@ void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
       }
     }
   }
-}
+}  // end Solver::bfs
 
-int main() {
+void Solver::start() {
   while (1) {
-    std::ifstream fin("given.txt");
+    std::ifstream fin;
+    try {
+      fin.open("given.txt");
+    } catch (const ifstream::failure& exception) {
+      std::cout << "Could not open file :(\n";
+      return;
+    }
+    std::cout << "💾 Opened file...\n";
+
     Matrix lines;
     Matrix flags(5, "11111");
     std::string line;
-    std::cout << "CALCULATING...\n";
+    std::cout << "⚒ CALCULATING...\n";
     while (fin >> line) {
       std::string clean = "";
       bool offset = 0;
@@ -152,17 +102,18 @@ int main() {
       lines.push_back(clean);
     }
     if (DEBUG) {
+      std::cout << "Clean Input:\n";
       for (string s : lines) {
         std::cout << s << "\n";
       }
-      std::cout << "\nFLAGS\n";
+      std::cout << "\nFLAGS:\n";
       for (string s : flags) {
         std::cout << s << "\n";
       }
     }
 
     std::vector<Item> results;
-    bfs(lines, flags, 0, 0, results);
+    bfs(lines, flags, results);
 
     std::sort(begin(results), end(results), [](auto a, auto b) {
       a.value -= a.has_replaced ? REPLACE_COST : 0;
@@ -179,7 +130,7 @@ int main() {
         continue;
       }
       std::cout << item.value << " " << item.cword << "\n";
-      printGridWord(lines, item);
+      util::printGridWord(lines, item);
       if (!--i) {
         break;
       }
@@ -188,6 +139,5 @@ int main() {
     std::cout << std::string(50, '=') << "\n";
     std::cout << "PRESS ENTER ONCE YOU'VE MODIFIED given.txt\n";
     cin.get();
-  }
-  return 0;
-}
+  }  // end main while
+}  // end Solver::start

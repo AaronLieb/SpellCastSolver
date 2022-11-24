@@ -1,3 +1,6 @@
+#ifndef _PREFIXTREE_H
+#define _PREFIXTREE_H
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -60,3 +63,5 @@ class PrefixTree {  // thanks robot overlords
     return true;
   }
 };
+
+#endif

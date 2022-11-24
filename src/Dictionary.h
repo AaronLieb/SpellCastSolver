@@ -1,6 +1,9 @@
+#ifndef _DICTIONARY_H
+#define _DICTIONARY_H
+
 #include <bits/stdc++.h>
 
-#include "PrefixTree.cc"
+#include "PrefixTree.h"
 
 using Seen = std::set<std::pair<int, int>>;
 using Matrix = std::vector<std::string>;
@@ -33,3 +36,5 @@ class Dictionary {
 };
 
 static Dictionary dictionary("dictionary.txt");
+
+#endif
