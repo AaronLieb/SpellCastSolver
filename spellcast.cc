@@ -5,7 +5,7 @@
 #define MAXWORDSIZE 15
 #define REPLACE_COST 10
 #define LONGWORD_BONUS 20
-#define LONGWORD_MIN 8
+#define LONGWORD_MIN 7
 #define USEREPLACE true
 #define DOUBLE '2'
 #define TRIPLE '3'
