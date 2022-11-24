@@ -8,7 +8,7 @@ using Matrix = std::vector<std::string>;
 class Dictionary {
   std::unordered_set<std::string> dict;
   int values[26] = {1, 4, 5, 3, 1, 5, 3, 4, 1, 7, 6, 3, 4,
-                    2, 1, 4, 8, 4, 2, 4, 5, 5, 7, 4, 8};
+                    2, 1, 4, 8, 2, 2, 2, 4, 5, 5, 7, 4, 8};
 
  public:
   PrefixTree prefix_tree;

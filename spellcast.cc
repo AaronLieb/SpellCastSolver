@@ -8,46 +8,42 @@ const int DOUBLE = 0x2;
 const int TRIPLE = 0x4;
 const int MULTI = 0x6;
 }  // namespace rules
+namespace style {
+const std::string color = "\u001b[32m";  // TBD
+const std::string bold = "\u001b[1m";
+const std::string black = "\u001b[30m";
+const std::string white_bg = "\u001b[47m";
+const std::string black_bg = "\u001b[40;1m";
+const std::string reset = "\u001b[0m";
+}  // namespace style
 
 using Matrix = std::vector<std::string>;
 using Seen = std::set<std::pair<int, int>>;
 
-void dfs(const Matrix& lines, int r, int c, Seen visited,
-         std::string cword = "") {
-  static std::unordered_set<std::string> found;
-  cword += lines[r][c];
-  if (cword.size() >= MAXWORDSIZE) return;
-  if (visited.count({r, c})) return;
-  // std::cout << "cword: " << cword << "\n";
-  // std::cout << "here at: " << r << " " << c << "\n";
-  if (dictionary.contains(cword) and found.count(cword) == 0 and
-      cword.size() > 2) {
-    std::cout << "found: " << cword << "\n";
-    found.insert(cword);
-  }
+struct Item {
+  std::pair<int, int> pos;
+  std::string cword;
+  Seen visited;
+  int value;
+  bool is_multi = false;
+};
 
-  visited.insert({r, c});
-  /*  visit neighbors */
-  for (int nr = r - 1; nr < r + 2; ++nr) {
-    if (nr < 0 || nr >= lines.size()) continue;
-    for (int nc = c - 1; nc < c + 2; ++nc) {  // gen all pairs
-      if (nc < 0 || nc >= lines[0].size()) continue;
-      dfs(lines, nr, nc, visited, cword);
+void printGridWord(const Matrix& lines, const Item& item) {
+  for (int r{}; r < lines.size(); ++r) {
+    for (int c{}; c < lines[r].size(); ++c) {
+      bool is_in_word = item.visited.count({r, c});
+      char chr = lines[r][c];
+      std::cout << style::black_bg;
+      std::cout << (is_in_word ? style::color + style::bold : style::black)
+                << chr << " " << style::reset;
     }
+    std::cout << "\n";
   }
 }
 
 void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
-         std::vector<std::pair<std::string, int>>& results) {
+         std::vector<Item>& results) {
   static std::unordered_set<std::string> found;
-
-  struct Item {
-    std::pair<int, int> pos;
-    std::string cword;
-    Seen visited;
-    int value;
-    bool is_multi = false;
-  };
 
   std::queue<Item> Q;
   for (int i{}; i < 5; ++i) {
@@ -75,7 +71,8 @@ void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
     if (dictionary.contains(f.cword) and found.count(f.cword) == 0 and
         f.cword.size() > 2) {
       int value = f.value * (f.is_multi ? 2 : 1);
-      results.push_back({f.cword, value});
+      f.visited.insert(f.pos);
+      results.push_back(f);
       // std::cout << value << " " << f.cword << "\n";
       found.insert(f.cword);
     }
@@ -124,31 +121,19 @@ int main() {
     std::cout << s << "\n";
   }
 
-  /* start a dfs at each starting position */
-  // { /* dfs */
-  //   for (int r{}; r < 5; ++r) {
-  //     for (int c{}; c < 5; ++c) {
-  //       std::set<std::pair<int, int>> visited;  // construct new visi per
-  //       trav. dfs(lines, r, c, visited);
-  //     }
-  //   }
-  // }
-
-  std::vector<std::pair<std::string, int>> results;
-
+  std::vector<Item> results;
   bfs(lines, flags, 0, 0, results);
 
   std::sort(begin(results), end(results),
-            [](auto a, auto b) { return a.second > b.second; });
+            [](auto a, auto b) { return a.value > b.value; });
 
-  // std::cout << results[0].first << " " << results[0].second << "\n";
-  for (auto [word, val] : results) {
-    std::cout << word << " " << val << "\n";
+  int i = 3;
+  for (Item& item : results) {
+    std::cout << item.value << " " << item.cword << "\n";
+    printGridWord(lines, item);
+    if (!i--) break;
+    std::cout << "\n";
   }
-  // auto result = dictionary.prefix.startsWith("meaningfulness");
-  // std::cout << std::boolalpha << result << "\n";
-  // auto result = dictionary.contains("meaningfulness");
-  // std::cout << std::boolalpha << result << "\n";
 
   return 0;
 }
