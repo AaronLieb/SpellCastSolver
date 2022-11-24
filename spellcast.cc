@@ -131,57 +131,63 @@ void bfs(const Matrix& lines, const Matrix& flags, int sr, int sc,
 }
 
 int main() {
-  Matrix lines;
-  Matrix flags(5, "11111");
-  std::string line;
-  while (std::cin >> line) {
-    std::string clean = "";
-    bool offset = 0;
-    for (int x{}; x < line.size(); ++x) {
-      if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
-        flags[lines.size()][x - offset] = line[x];
-        offset = 1;
+  while (1) {
+    std::ifstream fin("given.txt");
+    Matrix lines;
+    Matrix flags(5, "11111");
+    std::string line;
+    std::cout << "CALCULATING...\n";
+    while (fin >> line) {
+      std::string clean = "";
+      bool offset = 0;
+      for (int x{}; x < line.size(); ++x) {
+        if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
+          flags[lines.size()][x - offset] = line[x];
+          offset = 1;
+          continue;
+        }
+        // 2abyXpt
+        clean += line[x];
+      }
+      lines.push_back(clean);
+    }
+    if (DEBUG) {
+      for (string s : lines) {
+        std::cout << s << "\n";
+      }
+      std::cout << "\nFLAGS\n";
+      for (string s : flags) {
+        std::cout << s << "\n";
+      }
+    }
+
+    std::vector<Item> results;
+    bfs(lines, flags, 0, 0, results);
+
+    std::sort(begin(results), end(results), [](auto a, auto b) {
+      a.value -= a.has_replaced ? REPLACE_COST : 0;
+      b.value -= b.has_replaced ? REPLACE_COST : 0;
+      return a.value > b.value;
+    });
+
+    int i = 5, max_depth = 100;
+    bool used_non_replacement = false;
+    for (Item& item : results) {
+      if (item.has_replaced == false) used_non_replacement = true;
+      if (i == 1 && !used_non_replacement) {
+        if (!--max_depth) break;
         continue;
       }
-      // 2abyXpt
-      clean += line[x];
+      std::cout << item.value << " " << item.cword << "\n";
+      printGridWord(lines, item);
+      if (!--i) {
+        break;
+      }
+      std::cout << "\n";
     }
-    lines.push_back(clean);
+    std::cout << std::string(50, '=') << "\n";
+    std::cout << "PRESS ENTER ONCE YOU'VE MODIFIED given.txt\n";
+    cin.get();
   }
-  if (DEBUG) {
-    for (string s : lines) {
-      std::cout << s << "\n";
-    }
-    std::cout << "\nFLAGS\n";
-    for (string s : flags) {
-      std::cout << s << "\n";
-    }
-  }
-
-  std::vector<Item> results;
-  bfs(lines, flags, 0, 0, results);
-
-  std::sort(begin(results), end(results), [](auto a, auto b) {
-    a.value -= a.has_replaced ? REPLACE_COST : 0;
-    b.value -= b.has_replaced ? REPLACE_COST : 0;
-    return a.value > b.value;
-  });
-
-  int i = 5, max_depth = 100;
-  bool used_non_replacement = false;
-  for (Item& item : results) {
-    if (item.has_replaced == false) used_non_replacement = true;
-    if (i == 1 && !used_non_replacement) {
-      if (!--max_depth) break;
-      continue;
-    }
-    std::cout << item.value << " " << item.cword << "\n";
-    printGridWord(lines, item);
-    if (!--i) {
-      break;
-    }
-    std::cout << "\n";
-  }
-
   return 0;
 }
