@@ -142,7 +142,7 @@ void Solver::start() {
     std::cout << std::string(50, '=') << "\n";
     std::cout << "🟩 PRESS ENTER ONCE YOU'VE MODIFIED given.txt\n";
     std::cout << "🛑 Type s to STOP\n";
-    std::string resp = "hi";
+    std::string resp;
     std::getline(std::cin, resp);
     if (resp == "s") this->running = false;
     system("clear");  // clear console window
