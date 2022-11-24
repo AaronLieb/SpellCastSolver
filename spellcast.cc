@@ -7,14 +7,11 @@
 #define LONGWORD_BONUS 20
 #define LONGWORD_MIN 8
 #define USEREPLACE true
-// double = '2'
-// triple = '3'
-// multi = 'X'
-namespace rules {
-const int DOUBLE = 0x2;
-const int TRIPLE = 0x4;
-const int MULTI = 0x6;
-}  // namespace rules
+#define DOUBLE '2'
+#define TRIPLE '3'
+#define MULTI 'X'
+#define DEBUG false
+
 namespace style {
 const std::string green = "\u001b[32m";  // green
 const std::string bold = "\u001b[1m";
@@ -141,7 +138,7 @@ int main() {
     std::string clean = "";
     bool offset = 0;
     for (int x{}; x < line.size(); ++x) {
-      if (line[x] == '2' or line[x] == '3' or line[x] == 'X') {
+      if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
         flags[lines.size()][x - offset] = line[x];
         offset = 1;
         continue;
@@ -151,13 +148,14 @@ int main() {
     }
     lines.push_back(clean);
   }
-
-  for (string s : lines) {
-    std::cout << s << "\n";
-  }
-  std::cout << "\nFLAGS\n";
-  for (string s : flags) {
-    std::cout << s << "\n";
+  if (DEBUG) {
+    for (string s : lines) {
+      std::cout << s << "\n";
+    }
+    std::cout << "\nFLAGS\n";
+    for (string s : flags) {
+      std::cout << s << "\n";
+    }
   }
 
   std::vector<Item> results;
