@@ -16,12 +16,14 @@
 #define DOUBLE '2'
 #define TRIPLE '3'
 #define MULTI 'X'
-#define DEBUG true
+#define DEBUG false
 
 class Solver {
  private:
+  bool running;
+
  public:
-  Solver() = default;
+  Solver() : running(false) {}
   void bfs(const Matrix& lines, const Matrix& flags,
            std::vector<Item>& results);
   void start();

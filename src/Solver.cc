@@ -73,12 +73,15 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
 }  // end Solver::bfs
 
 void Solver::start() {
-  while (1) {
+  this->running = true;
+
+  while (this->running) {
     std::ifstream fin;
     try {
       fin.open("given.txt");
     } catch (const ifstream::failure& exception) {
       std::cout << "Could not open file :(\n";
+      this->running = false;
       return;
     }
     std::cout << "💾 Opened file...\n";
@@ -137,7 +140,11 @@ void Solver::start() {
       std::cout << "\n";
     }
     std::cout << std::string(50, '=') << "\n";
-    std::cout << "PRESS ENTER ONCE YOU'VE MODIFIED given.txt\n";
-    cin.get();
+    std::cout << "🟩 PRESS ENTER ONCE YOU'VE MODIFIED given.txt\n";
+    std::cout << "🛑 Type s to STOP\n";
+    std::string resp = "hi";
+    std::getline(std::cin, resp);
+    if (resp == "s") break;
+
   }  // end main while
 }  // end Solver::start
