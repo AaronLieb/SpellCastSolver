@@ -1,41 +1,70 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+#include <fstream>
+
 #include "Item.h"
+#include "cli.h"
 #include "types.h"
 
-namespace util {
-namespace style {
-const std::string green = "\u001b[32m";  // green
-const std::string bold = "\u001b[1m";
-const std::string black = "\u001b[30m";
-const std::string white_bg = "\u001b[47m";
-const std::string black_bg = "\u001b[40;1m";
-const std::string reset = "\u001b[0m";
-const std::string red = "\u001b[31m";
-}  // namespace style
+namespace utils {
 
-void static printGridWord(const Matrix& lines, const Item& item) {
-  for (int r{}; r < lines.size(); ++r) {
-    for (int c{}; c < lines[r].size(); ++c) {
-      bool is_in_word = item.visited.count({r, c});
-      char chr = lines[r][c];
-      std::string color = style::green;
-      Replacement rep = item.replacement;
+struct Parsed {
+  Matrix lines, flags;
+};
 
-      if (item.has_replaced &&
-          (rep.first.first == r && rep.first.second == c)) {
-        color = style::red;
-        chr = rep.second;
-      }
-
-      std::cout << style::black_bg;
-      std::cout << (is_in_word ? color + style::bold : style::black) << chr
-                << " " << style::reset;
-    }
-    std::cout << "\n";
+static Parsed openGiven() {
+  Parsed parsed;
+  std::ifstream fin;
+  try {
+    fin.open("given.txt");
+  } catch (const std::ifstream::failure& exception) {
+    cli::log("Could not open file.");
+    return parsed;
   }
-}
-}  // namespace util
+  cli::log("💾 Opened file...");
 
+  Matrix lines;
+  Matrix flags(5, "11111");
+  std::string line;
+  cli::log("🏃‍♀️ CALCULATING...");
+
+  while (fin >> line) {
+    std::string clean = "";
+    bool offset = 0;
+    for (int x{}; x < line.size(); ++x) {
+      if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
+        flags[lines.size()][x - offset] = line[x];
+        offset = 1;
+        continue;
+      }
+      clean += line[x];
+    }
+    lines.push_back(clean);
+  }
+
+  return {lines, flags};
+}
+
+auto sortByHeuristic(auto& to_sort) {
+  std::sort(begin(to_sort), end(to_sort), [](auto a, auto b) {
+    a.value -= a.has_replaced ? REPLACE_COST : 0;
+    b.value -= b.has_replaced ? REPLACE_COST : 0;
+    return a.value > b.value;
+  });
+}
+
+auto topNWithKReplacements(auto& results, int n, int k) -> auto{
+  typename std::decay<decltype(results)>::type topn;
+  for (const Item& result : results) {
+    /* TO-DO: change has_replaced to replace_count */
+    if (result.has_replaced == k) {
+      topn.push_back(result);
+      if (!--n) break;
+    }
+  }
+  return topn;
+}
+
+}  // namespace utils
 #endif

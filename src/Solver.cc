@@ -74,78 +74,45 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
 
 void Solver::start() {
   this->running = true;
-
   while (this->running) {
-    std::ifstream fin;
-    try {
-      fin.open("given.txt");
-    } catch (const ifstream::failure& exception) {
-      std::cout << "Could not open file :(\n";
-      this->running = false;
-      return;
-    }
-    std::cout << "💾 Opened file...\n";
+    auto [lines, flags] = utils::openGiven();
 
-    Matrix lines;
-    Matrix flags(5, "11111");
-    std::string line;
-    std::cout << "⚒ CALCULATING...\n";
-    while (fin >> line) {
-      std::string clean = "";
-      bool offset = 0;
-      for (int x{}; x < line.size(); ++x) {
-        if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
-          flags[lines.size()][x - offset] = line[x];
-          offset = 1;
-          continue;
-        }
-        // 2abyXpt
-        clean += line[x];
-      }
-      lines.push_back(clean);
-    }
-    if (DEBUG) {
-      std::cout << "Clean Input:\n";
-      for (string s : lines) {
-        std::cout << s << "\n";
-      }
-      std::cout << "\nFLAGS:\n";
-      for (string s : flags) {
-        std::cout << s << "\n";
-      }
-    }
+    if (DEBUG) cli::util::showGiven(lines, flags);
 
     std::vector<Item> results;
     bfs(lines, flags, results);
 
-    std::sort(begin(results), end(results), [](auto a, auto b) {
-      a.value -= a.has_replaced ? REPLACE_COST : 0;
-      b.value -= b.has_replaced ? REPLACE_COST : 0;
-      return a.value > b.value;
-    });
+    utils::sortByHeuristic(results);
 
-    int i = 5, max_depth = 100;
-    bool used_non_replacement = false;
-    for (Item& item : results) {
-      if (item.has_replaced == false) used_non_replacement = true;
-      if (i == 1 && !used_non_replacement) {
-        if (!--max_depth) break;
-        continue;
-      }
-      std::cout << item.value << " " << item.cword << "\n";
-      util::printGridWord(lines, item);
-      if (!--i) {
-        break;
-      }
-      std::cout << "\n";
+    auto no_replace = utils::topNWithKReplacements(results, 3, 0);
+    auto one_replace = utils::topNWithKReplacements(results, 3, 1);
+
+    for (const Item& item : one_replace) {
+      cli::util::printGridWord(lines, item);
     }
-    std::cout << std::string(50, '=') << "\n";
-    std::cout << "🟩 PRESS ENTER ONCE YOU'VE MODIFIED given.txt\n";
-    std::cout << "🛑 Type s to STOP\n";
-    std::string resp;
-    std::getline(std::cin, resp);
-    if (resp == "s") this->running = false;
-    system("clear");  // clear console window
+
+    for (const Item& item : no_replace) {
+      cli::util::printGridWord(lines, item);
+    }
+    // int i = 5, max_depth = 100;
+    // bool used_non_replacement = false;
+    // for (Item& item : results) {
+    //   if (item.has_replaced == false) used_non_replacement = true;
+    //   if (i == 1 && !used_non_replacement) {
+    //     if (!--max_depth) break;
+    //     continue;
+    //   }
+    //   std::cout << item.value << " " << item.cword << "\n";
+    //   cli::util::printGridWord(lines, item);
+    //   if (!--i) {
+    //     break;
+    //   }
+    //   std::cout << "\n";
+    // }
+
+    cli::endPrompt();
+    this->running = cli::getEndResponse();  // type 's' to stop!
+    cli::clearConsole();
 
   }  // end main while
 }  // end Solver::start
