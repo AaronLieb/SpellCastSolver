@@ -19,7 +19,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
     char to_add = lines[f.pos.first][f.pos.second];
     char flag = flags[f.pos.first][f.pos.second];
 
-    if (USEREPLACE && !f.has_replaced) {
+    if (USE_REPLACE && !f.has_replaced) {
       for (char chr = 'a'; chr <= 'z'; ++chr) {
         if (chr == to_add) continue;
         Item cf = f;
@@ -34,9 +34,9 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
 
     if (f.pos != f.replacement.first) f.cword += to_add;  // cleaned
 
-    if (f.cword.size() >= MAXWORDSIZE) continue;
+    if (f.cword.size() >= MAX_WORD_SIZE) continue;
     if (!dictionary.isPrefix(f.cword)) continue;
-    if (flag == 'X') {
+    if (flag == MULTI) {
       f.is_multi = true;
       f.value += dictionary.getCharValue(to_add);
     } else {
