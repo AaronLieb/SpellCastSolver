@@ -4,9 +4,7 @@
 #include <bits/stdc++.h>
 
 #include "PrefixTree.h"
-
-using Seen = std::set<std::pair<int, int>>;
-using Matrix = std::vector<std::string>;
+#include "types.h"
 
 class Dictionary {
   std::unordered_set<std::string> dict;
