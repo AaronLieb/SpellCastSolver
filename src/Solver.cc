@@ -2,7 +2,7 @@
 
 void Solver::bfs(const Matrix& lines, const Matrix& flags,
                  std::vector<Item>& results) {
-  static std::unordered_set<std::string> found;
+  std::unordered_set<std::string> found;
 
   std::queue<Item> Q;
   for (int i{}; i < 5; ++i) {
@@ -75,7 +75,9 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
 void Solver::start() {
   this->running = true;
   while (this->running) {
+    cli::util::busyCheckForRewrite();
     auto [lines, flags] = utils::openGiven();
+    // cli::util::checkRewrite();
 
     if (DEBUG) cli::util::showGiven(lines, flags);
 
@@ -84,8 +86,8 @@ void Solver::start() {
 
     utils::sortByHeuristic(results);
 
-    auto no_replace = utils::topNWithKReplacements(results, 3, 0);
-    auto one_replace = utils::topNWithKReplacements(results, 3, 1);
+    auto no_replace = utils::topNWithKReplacements(results, 2, 0);
+    auto one_replace = utils::topNWithKReplacements(results, 2, 1);
 
     for (const Item& item : one_replace) {
       cli::util::printGridWord(lines, item);
@@ -95,9 +97,9 @@ void Solver::start() {
       cli::util::printGridWord(lines, item);
     }
 
-    cli::endPrompt();
-    this->running = cli::getEndResponse();  // type 's' to stop!
-    cli::clearConsole();
+    // cli::endPrompt();
+    // this->running = cli::getEndResponse();  // type 's' to stop!
+    // cli::clearConsole();
 
   }  // end main while
 }  // end Solver::start

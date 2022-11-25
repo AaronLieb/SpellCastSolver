@@ -13,4 +13,12 @@ struct Item {
   Replacement replacement;
 };
 
+static std::ostream& operator<<(std::ostream& os, const Item& item) {
+  os << "{"
+     << "cword: " << item.cword << ", pos: "
+     << "(" << item.pos.first << ", " << item.pos.second << ")"
+     << ", has_replaced: " << item.has_replaced << "}";
+  return os;
+}
+
 #endif

@@ -1,8 +1,11 @@
 #ifndef _CLI_H
 #define _CLI_H
 
+#include <chrono>
+#include <filesystem>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include "Item.h"
 #include "types.h"
@@ -80,6 +83,50 @@ auto showGiven(auto lines, auto flags) -> void {
   for (string s : flags) {
     cli::log(s);
   }
+}
+
+template <typename TP>
+static std::time_t to_time_t(TP tp) {
+  using namespace std::chrono;
+  auto sctp = time_point_cast<std::chrono::system_clock::duration>(
+      tp - TP::clock::now() + std::chrono::system_clock::now());
+  return std::chrono::system_clock::to_time_t(sctp);
+}
+
+inline auto getLastFileWriteTime() -> std::time_t {
+  std::filesystem::path fpath = "given.txt";
+  auto ftime = std::filesystem::last_write_time(fpath);
+  std::time_t time = to_time_t(ftime);
+  return time;
+}
+
+static auto checkRewrite() -> bool {
+  static std::time_t last_write{-1};
+  std::time_t curr_time = getLastFileWriteTime();
+  if (last_write == curr_time) return false;
+  // cli::log("🚫 File Not Changed From Previous Run 🚫");
+  last_write = curr_time;
+  return true;
+}
+
+inline auto sleep(unsigned ms) -> void {
+  std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+static auto busyCheckForRewrite() -> void {
+  // static std::vector<std::string> anim{"--", "\\", "|", "/"};
+  static std::string anim{"📚📕📗📘📖"};
+  int i{};
+  std::cout << "\n📝 Waiting For Change to given.txt ...  ";
+  while (!checkRewrite()) {
+    std::cout << anim[i++ % anim.size()] << std::flush;
+    sleep(250);
+    if (i % 20 == 0 and i)
+      std::cout << std::string(10, '\b') << std::string(10, ' ')
+                << std::string(10, '\b') << std::flush;
+    // std::cout << "\b";
+  }
+  clearConsole();
 }
 
 }  // namespace util

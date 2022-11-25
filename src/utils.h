@@ -22,12 +22,12 @@ static Parsed openGiven() {
     cli::log("Could not open file.");
     return parsed;
   }
-  cli::log("💾 Opened file...");
+  cli::log("💾 Opened File ✅");
 
   Matrix lines;
   Matrix flags(5, "11111");
   std::string line;
-  cli::log("🏃‍♀️ CALCULATING...");
+  cli::log("🧠 CALCULATING 🧠");
 
   while (fin >> line) {
     std::string clean = "";
@@ -56,7 +56,6 @@ auto sortByHeuristic(auto& to_sort) {
 
 auto topNWithKReplacements(auto& results, int n, int k) -> auto{
   int max_depth = 2048;
-
   typename std::decay<decltype(results)>::type topn;
   for (const Item& result : results) {
     /* TO-DO: change has_replaced to replace_count */
