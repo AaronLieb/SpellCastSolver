@@ -42,7 +42,10 @@ static Parsed openGiven() {
     }
     lines.push_back(clean);
   }
-
+  if (lines.size() != 5) {
+    cli::log("⚠⚠⚠ YOU ONLY ENTERED", lines.size(), "LINES... NEED 5 ⚠⚠⚠");
+    throw(std::out_of_range("bad input"));
+  }
   return {lines, flags};
 }
 
