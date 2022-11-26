@@ -24,7 +24,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags, Results& results) {
         auto cf = f;
         cf.cword += chr;
         cf.replacement = {cf.pos, chr};
-        // cf.value -= dictionary.getCharValue(to_add, flag);
+        cf.value -= dictionary.getCharValue(to_add, flag);
         cf.replace_count += 1;
         Q.push(cf);
       }

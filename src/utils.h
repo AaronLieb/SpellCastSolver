@@ -5,6 +5,7 @@
 
 #include "Item.h"
 #include "cli.h"
+#include "err.h"
 #include "types.h"
 
 namespace utils {
@@ -32,6 +33,10 @@ static Parsed openGiven() {
   cli::log("🧠 CALCULATING 🧠");
 
   while (fin >> line) {
+    if (int num_lines = lines.size(); num_lines >= 5) {
+      error::promptBadInputSize(num_lines + 1);
+      return openGiven();
+    }
     std::string clean = "";
     int flags_seen = 0;
     for (int x{}; x < line.size(); ++x) {
@@ -40,14 +45,23 @@ static Parsed openGiven() {
         flags_seen += 1;
         continue;
       }
+
+      /* TODO... support uppercase for gems */
+      if (line[x] < 'a' || line[x] > 'z') {
+        error::promptBadInput(line[x]);
+        return openGiven();  // retry!
+      }
+
       clean += line[x];
     }
     lines.push_back(clean);
   }
-  if (lines.size() != 5) {
-    cli::log("⚠⚠⚠ YOU ONLY ENTERED", lines.size(), "LINES... NEED 5 ⚠⚠⚠");
-    throw(std::out_of_range("bad input"));
+
+  if (int num_lines = lines.size(); num_lines != 5) {
+    error::promptBadInputSize(num_lines);
+    return openGiven();
   }
+
   return {lines, flags};
 }
 

@@ -33,6 +33,9 @@ class Dictionary {
 
   int getCharValue(char c, char flag) const {
     if (flag == MULTI) return this->values[c - 'a'];
+    if (flag != DOUBLE && flag != TRIPLE && flag != '1') {
+      throw(std::domain_error("⚠⚠⚠ bad flag... recheck given.txt⚠⚠⚠⚠\n"));
+    }
     return this->values[c - 'a'] * (flag - '0');
   }
 };
