@@ -1,6 +1,30 @@
 #ifndef _CLI_H
 #define _CLI_H
 
+/*
+  evil macro
+  source:
+  stackoverflow.com/questions/32226300/make-variadic-macro-method-which-prints-all-variables-names-and-values
+*/
+#define debug(...)                                         \
+  do {                                                     \
+    if (DEBUG) show(std::cout, #__VA_ARGS__, __VA_ARGS__); \
+  } while (0);
+
+template <typename H1>
+std::ostream& show(std::ostream& out, const char* label, H1&& value) {
+  return out << label << "=" << std::forward<H1>(value) << '\n';
+}
+
+template <typename H1, typename... T>
+std::ostream& show(std::ostream& out, const char* label, H1&& value,
+                   T&&... rest) {
+  const char* pcomma = strchr(label, ',');
+  return show(out.write(label, pcomma - label)
+                  << "=" << std::forward<H1>(value) << ',',
+              pcomma + 1, std::forward<T>(rest)...);
+}
+
 #include <chrono>
 #include <filesystem>
 #include <iostream>
@@ -33,13 +57,16 @@ const std::string green = "\u001b[32m";  // green
 const std::string bold = "\u001b[1m";
 const std::string black = "\u001b[30m";
 const std::string white_bg = "\u001b[47m";
+const std::string yellow_bg = "\u001b[43m";
+const std::string magenta_bg = "\u001b[45m";
+const std::string gray_bg = "\u001b[100m";
 const std::string black_bg = "\u001b[40;1m";
 const std::string reset = "\u001b[0m";
 const std::string red = "\u001b[31m";
 }  // namespace style
 
-static inline auto printGridWord(const Matrix& lines, const auto& item)
-    -> void {
+static inline auto printGridWord(const Matrix& lines, const Matrix& flags,
+                                 const auto& item) -> void {
   if (DEBUG)
     log("item", item);
   else
@@ -50,6 +77,7 @@ static inline auto printGridWord(const Matrix& lines, const auto& item)
       bool is_in_word = item.visited.count({r, c});
       char chr = lines[r][c];
       std::string color = style::green;
+      std::string bg_color = style::black_bg;
       Replacement rep = item.replacement;
 
       if (item.replace_count &&
@@ -58,7 +86,14 @@ static inline auto printGridWord(const Matrix& lines, const auto& item)
         chr = rep.second;
       }
 
-      std::cout << style::black_bg;
+      if (flags[r][c] == MULTI)
+        bg_color = style::yellow_bg;
+      else if (flags[r][c] == DOUBLE)
+        bg_color = style::gray_bg;
+      else if (flags[r][c] == TRIPLE)
+        bg_color = style::white_bg;
+
+      std::cout << (DEBUG ? bg_color : style::black_bg);
       std::cout << (is_in_word ? color + style::bold : style::black) << chr
                 << " " << style::reset;
     }
@@ -66,15 +101,10 @@ static inline auto printGridWord(const Matrix& lines, const auto& item)
   }
 }
 
-auto showGiven(auto lines, auto flags) -> void {
+static inline auto showGiven(auto lines, auto flags) -> void {
   cli::log("Clean Input:");
-  for (string s : lines) {
-    std::cout << s << "\n";
-  }
-  cli::log("\nFLAGS:");
-  for (string s : flags) {
-    cli::log(s);
-  }
+  Item dummy({-1, -1});
+  printGridWord(lines, flags, dummy);
 }
 
 template <typename TP>

@@ -4,7 +4,7 @@
 #define MAX_WORD_SIZE 18
 #define MIN_WORD_SIZE 3
 #define REPLACE_LIMIT 1
-#define REPLACE_COST 4
+#define REPLACE_COST 0
 #define LONGWORD_BONUS 20
 #define LONGWORD_MIN 7
 #define USE_REPLACE true

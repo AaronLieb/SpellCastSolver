@@ -24,14 +24,13 @@ struct Item {
   void visit() { visited.insert(pos); }
 
   void store(Results& results) {
-    int old_val = value;
+    int old_value = value;
     value <<= is_multi;  // mult by 2 (fast lol) fuk u lol
     value += (cword.size() >= LONGWORD_MIN) * LONGWORD_BONUS;
     /* have we made this word before */
     auto& bucket = results[replace_count];
-    auto f = bucket.find(*this);
     bucket.insert(*this);
-    value = old_val;
+    value = old_value;
   }
 
   bool seen() const { return visited.count(pos); }
@@ -46,6 +45,7 @@ static std::ostream& operator<<(std::ostream& os, const Item& item) {
   os << "{"
      << "cword: " << item.cword << ", pos: "
      << "(" << item.pos.first << ", " << item.pos.second << ")"
+     << ", is_multi: " << item.is_multi
      << ", replace_count: " << item.replace_count << ", value: " << item.value;
   os << ", visited: [";
   for (const auto& p : item.visited) {

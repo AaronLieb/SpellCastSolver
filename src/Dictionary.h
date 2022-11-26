@@ -31,7 +31,7 @@ class Dictionary {
     return prefix_tree.startsWith(prefix);
   }
 
-  int getCharValue(char c, char flag = '1') const {
+  int getCharValue(char c, char flag) const {
     if (flag == MULTI) return this->values[c - 'a'];
     return this->values[c - 'a'] * (flag - '0');
   }

@@ -27,15 +27,17 @@ static Parsed openGiven() {
   Matrix lines;
   Matrix flags(5, "11111");
   std::string line;
+
+  if (DEBUG) cli::log("🔧 ENV::DEBUG ENABLED 🔧");
   cli::log("🧠 CALCULATING 🧠");
 
   while (fin >> line) {
     std::string clean = "";
-    bool offset = 0;
+    int flags_seen = 0;
     for (int x{}; x < line.size(); ++x) {
       if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
-        flags[lines.size()][x - offset] = line[x];
-        offset = 1;
+        flags[lines.size()][x - flags_seen] = line[x];
+        flags_seen += 1;
         continue;
       }
       clean += line[x];
@@ -49,16 +51,12 @@ static Parsed openGiven() {
   return {lines, flags};
 }
 
-auto topNWithKReplacements(auto& results, int n, int k) -> auto{
-  typename std::decay<decltype(results)>::type topn;
-  for (const auto& result : results) {
-    /* TO-DO: change has_replaced to replace_count */
-    if (result.has_replaced == k) {
-      topn.insert(result);
-      if (!--n) break;
-    }
+auto showTopNWithKReplacements(const Matrix& lines, const Matrix& flags,
+                               auto& results, int n, int k) -> void {
+  for (auto&& result : results[k]) {
+    cli::util::printGridWord(lines, flags, result);
+    if (!--n) break;
   }
-  return topn;
 }
 
 }  // namespace utils
