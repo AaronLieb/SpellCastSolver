@@ -18,7 +18,7 @@ class Solver {
  public:
   Solver() : running(false), dictionary("dictionary.txt") {}
 
-  void bfs(const Matrix& lines, const Matrix& flags, std::vector<Item>& results);
+  void bfs(const Matrix& lines, const Matrix& flags, Results& results);
   void start();
 };
 

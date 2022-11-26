@@ -41,7 +41,7 @@ class PrefixTree {  // thanks robot overlords
     node->isWord = true;
   }
 
-  bool search(string word) {
+  bool search(string word) const {
     TrieNode* node = root;
     for (char c : word) {
       if (node->children[c - 'a'] == NULL) {
@@ -52,7 +52,7 @@ class PrefixTree {  // thanks robot overlords
     return node->isWord;
   }
 
-  bool startsWith(string prefix) {
+  bool startsWith(string prefix) const {
     TrieNode* node = root;
     for (char c : prefix) {
       if (node->children[c - 'a'] == NULL) {

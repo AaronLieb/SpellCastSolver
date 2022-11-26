@@ -40,7 +40,11 @@ const std::string red = "\u001b[31m";
 
 static inline auto printGridWord(const Matrix& lines, const auto& item)
     -> void {
-  std::cout << item.value << " " << item.cword << "\n";
+  if (DEBUG)
+    log("item", item);
+  else
+    log(item.value, item.cword);
+
   for (int r{}; r < lines.size(); ++r) {
     for (int c{}; c < lines[r].size(); ++c) {
       bool is_in_word = item.visited.count({r, c});
@@ -48,7 +52,7 @@ static inline auto printGridWord(const Matrix& lines, const auto& item)
       std::string color = style::green;
       Replacement rep = item.replacement;
 
-      if (item.has_replaced &&
+      if (item.replace_count &&
           (rep.first.first == r && rep.first.second == c)) {
         color = style::red;
         chr = rep.second;

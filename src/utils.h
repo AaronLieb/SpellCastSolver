@@ -49,24 +49,14 @@ static Parsed openGiven() {
   return {lines, flags};
 }
 
-auto sortByHeuristic(auto& to_sort) {
-  std::sort(begin(to_sort), end(to_sort), [](auto a, auto b) {
-    a.value -= a.has_replaced ? REPLACE_COST : 0;
-    b.value -= b.has_replaced ? REPLACE_COST : 0;
-    return a.value > b.value;
-  });
-}
-
 auto topNWithKReplacements(auto& results, int n, int k) -> auto{
-  int max_depth = 2048;
   typename std::decay<decltype(results)>::type topn;
   for (const auto& result : results) {
     /* TO-DO: change has_replaced to replace_count */
     if (result.has_replaced == k) {
-      topn.push_back(result);
+      topn.insert(result);
       if (!--n) break;
     }
-    if (!--max_depth) break;  // fail-safe if no words found with k replaces
   }
   return topn;
 }

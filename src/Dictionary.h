@@ -25,13 +25,13 @@ class Dictionary {
     }
   }
 
-  bool contains(const std::string& word) { return dict.count(word) != 0; }
-  bool contains(std::string&& word) { return dict.count(word); }
-  bool isPrefix(const std::string& prefix) {
+  bool contains(const std::string& word) const { return dict.count(word) != 0; }
+  bool contains(std::string&& word) const { return dict.count(word); }
+  bool isPrefix(const std::string& prefix) const {
     return prefix_tree.startsWith(prefix);
   }
 
-  int getCharValue(char c, char flag = '1') {
+  int getCharValue(char c, char flag = '1') const {
     if (flag == MULTI) return this->values[c - 'a'];
     return this->values[c - 'a'] * (flag - '0');
   }
