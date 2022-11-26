@@ -60,7 +60,7 @@ auto sortByHeuristic(auto& to_sort) {
 auto topNWithKReplacements(auto& results, int n, int k) -> auto{
   int max_depth = 2048;
   typename std::decay<decltype(results)>::type topn;
-  for (const Item& result : results) {
+  for (const auto& result : results) {
     /* TO-DO: change has_replaced to replace_count */
     if (result.has_replaced == k) {
       topn.push_back(result);

@@ -22,22 +22,9 @@ inline void log(T msg, Ts... rest) {
   log(rest...);
 }
 
-inline void endPrompt() {
-  log(std::string(50, '='));
-  log("🟩 PRESS ENTER ONCE YOU'VE MODIFIED given.txt");
-  log("🛑 Type s to STOP");
-}
-
 inline void clearConsole() {
   /* TO-DO: make this portable (-nix, win, mac) */
   system("clear");  // clear console window
-}
-
-inline bool getEndResponse() {
-  std::string resp;
-  std::getline(std::cin, resp);
-  if (resp == "s") return false;
-  return true;
 }
 
 namespace util {
@@ -51,7 +38,8 @@ const std::string reset = "\u001b[0m";
 const std::string red = "\u001b[31m";
 }  // namespace style
 
-void static printGridWord(const Matrix& lines, const Item& item) {
+static inline auto printGridWord(const Matrix& lines, const auto& item)
+    -> void {
   std::cout << item.value << " " << item.cword << "\n";
   for (int r{}; r < lines.size(); ++r) {
     for (int c{}; c < lines[r].size(); ++c) {
@@ -121,7 +109,7 @@ static auto busyCheckForRewrite() -> void {
   while (!checkRewrite()) {
     std::cout << anim[i++ % anim.size()] << std::flush;
     sleep(250);
-    if (i % 20 == 0 and i)
+    if (i % (anim.size() * 4) == 0 and i)
       std::cout << std::string(10, '\b') << std::string(10, ' ')
                 << std::string(10, '\b') << std::flush;
     // std::cout << "\b";

@@ -12,7 +12,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
   }
 
   while (!Q.empty()) {
-    Item f = Q.front();
+    auto f = Q.front();
     Q.pop();
     if (f.visited.count(f.pos)) continue;
 
@@ -22,7 +22,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
     if (USE_REPLACE && !f.has_replaced) {
       for (char chr = 'a'; chr <= 'z'; ++chr) {
         if (chr == to_add) continue;
-        Item cf = f;
+        auto cf = f;
         cf.cword += chr;
         cf.replacement = {cf.pos, chr};
         cf.value -= dictionary.getCharValue(to_add) *
@@ -64,7 +64,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
       for (int nc = c - 1; nc < c + 2; ++nc) {  // gen all pairs
         if (nc < 0 || nc >= lines[0].size()) continue;
         if (nr == r && nc == c) continue;  // ?
-        Item cf = f;
+        auto cf = f;
         cf.pos = {nr, nc};
         Q.push(cf);  // pos, cword, {visited}, value, ismulti
       }
@@ -89,17 +89,13 @@ void Solver::start() {
     auto no_replace = utils::topNWithKReplacements(results, 2, 0);
     auto one_replace = utils::topNWithKReplacements(results, 2, 1);
 
-    for (const Item& item : one_replace) {
+    for (const auto& item : one_replace) {
       cli::util::printGridWord(lines, item);
     }
 
-    for (const Item& item : no_replace) {
+    for (const auto& item : no_replace) {
       cli::util::printGridWord(lines, item);
     }
-
-    // cli::endPrompt();
-    // this->running = cli::getEndResponse();  // type 's' to stop!
-    // cli::clearConsole();
 
   }  // end main while
 }  // end Solver::start
