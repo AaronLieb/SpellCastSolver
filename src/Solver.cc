@@ -7,7 +7,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
   std::queue<Item> Q;
   for (int i{}; i < 5; ++i) {
     for (int j{}; j < 5; ++j) {
-      Q.push({{i, j}, "", {}, 0});  // pos, cword, {visited}, value
+      Q.push(Item({i, j}));
     }
   }
 
@@ -25,8 +25,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
         auto cf = f;
         cf.cword += chr;
         cf.replacement = {cf.pos, chr};
-        cf.value -= dictionary.getCharValue(to_add) *
-                    (flags[cf.pos.first][cf.pos.second] - 48);
+        cf.value -= dictionary.getCharValue(to_add, flag);
         cf.has_replaced = true;
         Q.push(cf);
       }
@@ -35,15 +34,10 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags,
     if (f.pos != f.replacement.first) f.cword += to_add;
     if (f.cword.size() >= MAX_WORD_SIZE) continue;
     if (!dictionary.isPrefix(f.cword)) continue;
-    if (flag == MULTI) {
-      f.is_multi = true;
-      f.value += dictionary.getCharValue(to_add);
-    } else {
-      f.value += dictionary.getCharValue(to_add) *
-                 (flags[f.pos.first][f.pos.second] - 48);
-    }
+    if (flag == MULTI) f.is_multi = true;
 
-    if (dictionary.contains(f.cword) and found.count(f.cword) == 0 and
+    f.value += dictionary.getCharValue(to_add, flag);
+    if (dictionary.contains(f.cword) && !found.count(f.cword) &&
         f.cword.size() > 2) {
       f.visited.insert(f.pos);
       int old_val = f.value;
@@ -95,6 +89,5 @@ void Solver::start() {
     for (const auto& item : no_replace) {
       cli::util::printGridWord(lines, item);
     }
-
   }  // end main while
 }  // end Solver::start

@@ -11,6 +11,15 @@ struct Item {
   bool is_multi;
   bool has_replaced;
   Replacement replacement;
+
+  Item(std::pair<int, int> _pos)
+      : pos(_pos),
+        cword(),
+        visited{},
+        value(0),
+        is_multi(false),
+        has_replaced(false),
+        replacement{} {}
 };
 
 static std::ostream& operator<<(std::ostream& os, const Item& item) {

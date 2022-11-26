@@ -109,7 +109,7 @@ static auto busyCheckForRewrite() -> void {
   while (!checkRewrite()) {
     std::cout << anim[i++ % anim.size()] << std::flush;
     sleep(250);
-    if (i % (anim.size() * 4) == 0 and i)
+    if (i % 20 == 0 and i)
       std::cout << std::string(10, '\b') << std::string(10, ' ')
                 << std::string(10, '\b') << std::flush;
     // std::cout << "\b";

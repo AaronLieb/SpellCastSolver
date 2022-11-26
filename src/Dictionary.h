@@ -4,6 +4,7 @@
 #include <bits/stdc++.h>
 
 #include "PrefixTree.h"
+#include "env.h"
 #include "types.h"
 
 class Dictionary {
@@ -30,7 +31,10 @@ class Dictionary {
     return prefix_tree.startsWith(prefix);
   }
 
-  int getCharValue(char c) { return this->values[c - 'a']; }
+  int getCharValue(char c, char flag = '1') {
+    if (flag == MULTI) return this->values[c - 'a'];
+    return this->values[c - 'a'] * (flag - '0');
+  }
 };
 
 #endif
