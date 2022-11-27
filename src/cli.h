@@ -78,12 +78,11 @@ static inline auto printGridWord(const Matrix& lines, const Matrix& flags,
       char chr = lines[r][c];
       std::string color = style::green;
       std::string bg_color = style::black_bg;
-      Replacement rep = item.replacement;
+      Replacements reps = item.replacements;
 
-      if (item.replace_count &&
-          (rep.first.first == r && rep.first.second == c)) {
+      if (auto f = reps.find({r, c}); f != reps.end()) {
         color = style::red;
-        chr = rep.second;
+        chr = f->second;
       }
 
       if (flags[r][c] == MULTI)

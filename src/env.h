@@ -2,13 +2,13 @@
 #define _ENV_H
 
 #define DEBUG true
-#define MAX_WORD_SIZE 18
-#define MIN_WORD_SIZE 4
-#define REPLACE_LIMIT 1
+#define MAX_WORD_SIZE 16
+#define MIN_WORD_SIZE 3
+#define REPLACE_LIMIT 3
 #define REPLACE_COST 6
+#define REPLACE_THRESHHOLD 12
 #define LONGWORD_BONUS 10
 #define LONGWORD_MIN 6
-#define USE_REPLACE true
 #define DOUBLE '2'
 #define TRIPLE '3'
 #define MULTI '$'

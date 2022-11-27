@@ -17,19 +17,22 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags, Results& results) {
     char flag = flags[f.pos.first][f.pos.second];
     f.is_multi = (flag == MULTI) || f.is_multi;
 
-    if (USE_REPLACE && f.replace_count < REPLACE_LIMIT) {
+    if (f.replace_count < REPLACE_LIMIT &&
+        f.value > (f.replace_count * REPLACE_THRESHHOLD)) {
       for (char chr = 'a'; chr <= 'z'; ++chr) {
         if (!dictionary.isPrefix(f.cword + chr)) continue;
         if (chr == to_add) continue;
         auto cf = f;
         cf.cword += chr;
-        cf.replacement = {cf.pos, chr};
+        cf.replacements[cf.pos] = chr;
         cf.replace_count += 1;
         Q.push(cf);
       }
     }
 
-    if (!f.replace_count || (f.pos != f.replacement.first)) f.cword += to_add;
+    if (!f.replace_count ||
+        (f.replacements.find(f.pos) == f.replacements.end()))
+      f.cword += to_add;
     if (f.cword.size() >= MAX_WORD_SIZE) continue;
     if (!dictionary.isPrefix(f.cword)) continue;
 
@@ -66,6 +69,8 @@ void Solver::start() {
     Results results;
     bfs(lines, flags, results);
 
+    utils::showTopNWithKReplacements(lines, flags, results, 2, 3);
+    utils::showTopNWithKReplacements(lines, flags, results, 2, 2);
     utils::showTopNWithKReplacements(lines, flags, results, 2, 1);
     utils::showTopNWithKReplacements(lines, flags, results, 2, 0);
   }  // end main while

@@ -10,7 +10,7 @@ struct Item {
   int value;
   bool is_multi;
   int replace_count;
-  Replacement replacement;
+  Replacements replacements;
 
   Item(std::pair<int, int> _pos)
       : pos(_pos),
@@ -19,7 +19,7 @@ struct Item {
         value(0),
         is_multi(false),
         replace_count{0},
-        replacement{} {}
+        replacements{} {}
 
   void visit() { visited.insert(pos); }
 

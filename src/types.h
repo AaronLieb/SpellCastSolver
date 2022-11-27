@@ -7,7 +7,7 @@
 
 using Matrix = std::vector<std::string>;
 using Seen = std::set<std::pair<int, int>>;
-using Replacement = std::pair<std::pair<int, int>, char>;
+using Replacements = std::map<std::pair<int, int>, char>;
 
 #define Results \
   std::map</* replace_count: */ int, std::set<Item, std::greater<Item>>>
