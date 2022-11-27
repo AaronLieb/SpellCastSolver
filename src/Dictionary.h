@@ -30,6 +30,36 @@ class Dictionary {
   bool isPrefix(const std::string& prefix) const {
     return prefix_tree.startsWith(prefix);
   }
+  int getValue(const std::string& word) const {
+    int value{};
+    for (char c : word) value += values[c - 'a'];
+    return value;
+  }
+  int heightHeuristic(const std::string& prefix) const {
+    return prefix_tree.getHeightOfPrefix(prefix);
+  }
+
+  int valueHeuristic(const std::string& prefix, int n) const {
+    // float value = static_cast<float>(this->getValue(prefix));
+    int value = this->getValue(prefix);
+    TrieNode* find = prefix_tree.search(prefix);
+    if (find == nullptr) return -1;  // not a prefix
+
+    std::queue<TrieNode*> Q;
+    Q.push(find);
+    while (!Q.empty() && n--) {
+      TrieNode* front = Q.front();
+      Q.pop();
+      for (char c = 'a'; c <= 'z'; ++c) {
+        TrieNode* child = front->children[c - 'a'];
+        if (child == NULL) continue;
+        value += values[c - 'a'];
+        Q.push(child);
+      }
+    }
+
+    return value;
+  }
 
   int getCharValue(char c, char flag) const {
     if (flag == MULTI) return this->values[c - 'a'];

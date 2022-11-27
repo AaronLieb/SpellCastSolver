@@ -20,8 +20,11 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags, Results& results) {
     if (f.replace_count < REPLACE_LIMIT &&
         f.value > (f.replace_count * REPLACE_THRESHHOLD)) {
       for (char chr = 'a'; chr <= 'z'; ++chr) {
-        if (!dictionary.isPrefix(f.cword + chr)) continue;
         if (chr == to_add) continue;
+        if (!dictionary.isPrefix(f.cword + chr)) continue;
+        if (dictionary.valueHeuristic(f.cword + chr, REPLACE_HEURISTIC_DEPTH) <
+            REPLACE_HEURISTIC_THRESHOLD)
+          continue;
         auto cf = f;
         cf.cword += chr;
         cf.replacements[cf.pos] = chr;
@@ -69,9 +72,9 @@ void Solver::start() {
     Results results;
     bfs(lines, flags, results);
 
-    utils::showTopNWithKReplacements(lines, flags, results, 2, 3);
-    utils::showTopNWithKReplacements(lines, flags, results, 2, 2);
-    utils::showTopNWithKReplacements(lines, flags, results, 2, 1);
-    utils::showTopNWithKReplacements(lines, flags, results, 2, 0);
+    utils::showTopNWithKReplacements(lines, flags, results, 1, 3);
+    utils::showTopNWithKReplacements(lines, flags, results, 1, 2);
+    utils::showTopNWithKReplacements(lines, flags, results, 1, 1);
+    utils::showTopNWithKReplacements(lines, flags, results, 1, 0);
   }  // end main while
 }  // end Solver::start

@@ -7,6 +7,7 @@ using namespace std;
 struct TrieNode {
   TrieNode* children[26];
   bool isWord;
+  int height;
   TrieNode() {
     isWord = false;
     for (int i = 0; i < 26; i++) {
@@ -32,24 +33,27 @@ class PrefixTree {  // thanks robot overlords
 
   void insert(string word) {
     TrieNode* node = root;
+    int i{};
     for (char c : word) {
+      ++i;
       if (node->children[c - 'a'] == NULL) {
         node->children[c - 'a'] = new TrieNode();
       }
+      node->height = std::max(node->height, static_cast<int>(word.size() - i));
       node = node->children[c - 'a'];
     }
     node->isWord = true;
   }
 
-  bool search(string word) const {
+  TrieNode* search(string word) const {
     TrieNode* node = root;
     for (char c : word) {
       if (node->children[c - 'a'] == NULL) {
-        return false;
+        return nullptr;
       }
       node = node->children[c - 'a'];
     }
-    return node->isWord;
+    return node;
   }
 
   bool startsWith(string prefix) const {
@@ -61,6 +65,12 @@ class PrefixTree {  // thanks robot overlords
       node = node->children[c - 'a'];
     }
     return true;
+  }
+
+  int getHeightOfPrefix(string prefix) const {
+    TrieNode* find = this->search(prefix);
+    if (find == nullptr) return -1;  // probably should throw here?
+    return find->height;
   }
 };
 
