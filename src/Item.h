@@ -57,15 +57,16 @@ static std::ostream& operator<<(std::ostream& os, const Item& item) {
 }
 
 static bool operator<(const Item& a, const Item& b) {
-  return a.value < b.value;
+  return (a.value - a.replace_count) < (b.value - b.replace_count);
 }
 
 static bool operator>(const Item& a, const Item& b) {
-  return a.value > b.value;
+  return (a.value - a.replace_count) > (b.value - b.replace_count);
 }
 
 static bool operator==(const Item& lhs, const Item& rhs) {
-  return (lhs.cword == rhs.cword) && (lhs.value == rhs.value);
+  return (lhs.cword == rhs.cword) && (lhs.value == rhs.value) &&
+         (lhs.replace_count == rhs.replace_count);
 }
 
 #endif

@@ -24,7 +24,6 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags, Results& results) {
         auto cf = f;
         cf.cword += chr;
         cf.replacement = {cf.pos, chr};
-        cf.value -= dictionary.getCharValue(to_add, flag);
         cf.replace_count += 1;
         Q.push(cf);
       }
@@ -34,7 +33,8 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags, Results& results) {
     if (f.cword.size() >= MAX_WORD_SIZE) continue;
     if (!dictionary.isPrefix(f.cword)) continue;
 
-    f.value += dictionary.getCharValue(to_add, flag);
+    f.value += dictionary.getCharValue(f.cword.back(), flag);
+
     f.visit();
     if (dictionary.contains(f.cword) && f.cword.size() >= MIN_WORD_SIZE) {
       f.store(results);
