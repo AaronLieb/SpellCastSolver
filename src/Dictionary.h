@@ -61,6 +61,12 @@ class Dictionary {
     return value;
   }
 
+  bool hasChild(const std::string& word, char c) {
+    TrieNode* find = prefix_tree.search(word);
+    if (find == nullptr) return false;
+    return (find->children[c - 'a'] != NULL);
+  }
+
   int getCharValue(char c, char flag) const {
     if (flag == MULTI) return this->values[c - 'a'];
     if (flag != DOUBLE && flag != TRIPLE && flag != '1') {

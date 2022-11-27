@@ -21,6 +21,7 @@ void Solver::bfs(const Matrix& lines, const Matrix& flags, Results& results) {
         f.value > (f.replace_count * REPLACE_THRESHHOLD)) {
       for (char chr = 'a'; chr <= 'z'; ++chr) {
         if (chr == to_add) continue;
+        if (!dictionary.hasChild(f.cword, chr)) continue;
         if (!dictionary.isPrefix(f.cword + chr)) continue;
         if (dictionary.valueHeuristic(f.cword + chr, REPLACE_HEURISTIC_DEPTH) <
             REPLACE_HEURISTIC_THRESHOLD)
