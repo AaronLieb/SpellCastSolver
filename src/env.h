@@ -2,10 +2,12 @@
 #define _ENV_H
 
 #define DEBUG false
+#define BOARD_SIZE 5
 #define MAX_WORD_SIZE 16
-#define MIN_WORD_SIZE 3
+#define MIN_WORD_SIZE 4
+#define GEM_VALUE 3
 #define REPLACE_LIMIT 3
-#define REPLACE_COST 6
+#define REPLACE_COST 9
 #define REPLACE_THRESHHOLD 12
 #define REPLACE_HEURISTIC_THRESHOLD 20
 #define REPLACE_HEURISTIC_DEPTH 2

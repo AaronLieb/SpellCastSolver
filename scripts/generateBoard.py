@@ -1,4 +1,4 @@
-from string import ascii_lowercase
+from string import ascii_lowercase, ascii_uppercase
 from random import choices, randint
 
 kNUM_LINES = 5
@@ -11,7 +11,8 @@ def main():
     fd = open("given.txt", "w")
     lines = []
     for _ in range(kNUM_LINES):
-        r = choices(ascii_lowercase, k=kNUM_LINES)
+        r = choices(ascii_lowercase + ascii_lowercase +
+                    ascii_uppercase, k=kNUM_LINES)
         lines += "".join(r) + "\n"
 
     placed = set()
