@@ -10,65 +10,65 @@
 
 namespace utils {
 
-struct Parsed {
-  Matrix lines, flags;
-};
-
-static Parsed openGiven() {
-  Parsed parsed;
+static Matrix openGiven() {
   std::ifstream fin;
   try {
     fin.open("given.txt");
   } catch (const std::ifstream::failure& exception) {
     cli::log("Could not open file.");
-    return parsed;
+    return {};
   }
   cli::log("💾 Opened File ✅");
 
-  Matrix lines;
-  Matrix flags(5, "11111");
+  Matrix cells(BOARD_SIZE, std::vector<Cell>{BOARD_SIZE, Cell{}});
   std::string line;
 
   if (DEBUG) cli::log("🔧 ENV::DEBUG ENABLED 🔧");
   cli::log("🧠 CALCULATING 🧠");
 
+  int num_lines = 0;
   while (fin >> line) {
-    if (int num_lines = lines.size(); num_lines >= 5) {
+    if (num_lines >= BOARD_SIZE) {
       error::promptBadInputSize(num_lines + 1);
       return openGiven();
     }
     std::string clean = "";
     int flags_seen = 0;
     for (int x{}; x < line.size(); ++x) {
-      if (line[x] == DOUBLE or line[x] == TRIPLE or line[x] == MULTI) {
-        flags[lines.size()][x - flags_seen] = line[x];
+      char& chr = line[x];
+      if (chr == DOUBLE or chr == TRIPLE or chr == MULTI) {
+        cells[num_lines][x - flags_seen].flag = chr;
         flags_seen += 1;
         continue;
       }
 
-      /* TODO... support uppercase for gems */
-      if (line[x] < 'a' || line[x] > 'z') {
-        error::promptBadInput(line[x]);
+      if (isupper(chr)) {
+        cells[num_lines][x - flags_seen].is_gem = true;
+        chr = tolower(chr);
+      }
+
+      if (chr < 'a' || chr > 'z') {
+        error::promptBadInput(chr);
         return openGiven();  // retry!
       }
 
-      clean += line[x];
+      clean += chr;
+      cells[num_lines][x - flags_seen].letter = chr;
     }
-    lines.push_back(clean);
+    num_lines++;
   }
 
-  if (int num_lines = lines.size(); num_lines != 5) {
+  if (num_lines != 5) {
     error::promptBadInputSize(num_lines);
     return openGiven();
   }
 
-  return {lines, flags};
+  return cells;
 }
 
-auto showTopNWithKReplacements(const Matrix& lines, const Matrix& flags,
-                               auto& results, int n, int k) -> void {
+auto showTopNWithKReplacements(const Matrix& cells, auto& results, int n, int k) -> void {
   for (auto&& result : results[k]) {
-    cli::util::printGridWord(lines, flags, result);
+    cli::util::printGridWord(cells, result);
     if (!--n) break;
   }
 }

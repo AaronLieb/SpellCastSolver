@@ -39,19 +39,19 @@ const std::string gray_bg = "\u001b[100m";
 const std::string black_bg = "\u001b[40;1m";
 const std::string reset = "\u001b[0m";
 const std::string red = "\u001b[31m";
+const std::string underline = "\u001b[4m";
 }  // namespace style
 
-static inline auto printGridWord(const Matrix& lines, const Matrix& flags,
-                                 const auto& item) -> void {
+static inline auto printGridWord(const Matrix& cells, const auto& item) -> void {
   if (DEBUG)
     log("item", item);
   else
     log(item.value, item.cword);
 
-  for (int r{}; r < lines.size(); ++r) {
-    for (int c{}; c < lines[r].size(); ++c) {
+  for (int r{}; r < cells.size(); ++r) {
+    for (int c{}; c < cells[r].size(); ++c) {
       bool is_in_word = item.visited.count({r, c});
-      char chr = lines[r][c];
+      char chr = cells[r][c].letter;
       std::string color = style::green;
       std::string bg_color = style::black_bg;
       Replacements reps = item.replacements;
@@ -61,12 +61,14 @@ static inline auto printGridWord(const Matrix& lines, const Matrix& flags,
         chr = f->second;
       }
 
-      if (flags[r][c] == MULTI)
+      if (cells[r][c].flag == MULTI)
         bg_color = style::yellow_bg;
-      else if (flags[r][c] == DOUBLE)
+      else if (cells[r][c].flag == DOUBLE)
         bg_color = style::gray_bg;
-      else if (flags[r][c] == TRIPLE)
+      else if (cells[r][c].flag == TRIPLE)
         bg_color = style::white_bg;
+
+      if (cells[r][c].is_gem) bg_color += style::underline;
 
       std::cout << (DEBUG ? bg_color : style::black_bg);
       std::cout << (is_in_word ? color + style::bold : style::black) << chr
@@ -76,10 +78,10 @@ static inline auto printGridWord(const Matrix& lines, const Matrix& flags,
   }
 }
 
-static inline auto showGiven(auto lines, auto flags) -> void {
+static inline auto showGiven(auto cells) -> void {
   cli::log("Clean Input:");
   Item dummy({-1, -1});
-  printGridWord(lines, flags, dummy);
+  printGridWord(cells, dummy);
 }
 
 template <typename TP>
