@@ -1,30 +1,6 @@
 #ifndef _CLI_H
 #define _CLI_H
 
-/*
-  evil macro
-  source:
-  stackoverflow.com/questions/32226300/make-variadic-macro-method-which-prints-all-variables-names-and-values
-*/
-#define debug(...)                                         \
-  do {                                                     \
-    if (DEBUG) show(std::cout, #__VA_ARGS__, __VA_ARGS__); \
-  } while (0);
-
-template <typename H1>
-std::ostream& show(std::ostream& out, const char* label, H1&& value) {
-  return out << label << "=" << std::forward<H1>(value) << '\n';
-}
-
-template <typename H1, typename... T>
-std::ostream& show(std::ostream& out, const char* label, H1&& value,
-                   T&&... rest) {
-  const char* pcomma = strchr(label, ',');
-  return show(out.write(label, pcomma - label)
-                  << "=" << std::forward<H1>(value) << ',',
-              pcomma + 1, std::forward<T>(rest)...);
-}
-
 #include <chrono>
 #include <filesystem>
 #include <iostream>
@@ -151,6 +127,32 @@ static auto busyCheckForRewrite() -> void {
 }
 
 }  // namespace util
+
+namespace debug {
+/*
+  evil macro
+  source:
+  stackoverflow.com/questions/32226300/make-variadic-macro-method-which-prints-all-variables-names-and-values
+*/
+#define debug(...)                                                     \
+  do {                                                                 \
+    if (DEBUG) cli::debug::show(std::cout, #__VA_ARGS__, __VA_ARGS__); \
+  } while (0);
+
+template <typename H1>
+std::ostream& show(std::ostream& out, const char* label, H1&& value) {
+  return out << label << "=" << std::forward<H1>(value) << '\n';
+}
+
+template <typename H1, typename... T>
+std::ostream& show(std::ostream& out, const char* label, H1&& value,
+                   T&&... rest) {
+  const char* pcomma = strchr(label, ',');
+  return show(out.write(label, pcomma - label)
+                  << "=" << std::forward<H1>(value) << ',',
+              pcomma + 1, std::forward<T>(rest)...);
+}
+}  // namespace debug
 
 }  // namespace cli
 
