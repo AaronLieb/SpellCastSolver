@@ -42,7 +42,8 @@ const std::string red = "\u001b[31m";
 const std::string underline = "\u001b[4m";
 }  // namespace style
 
-static inline auto printGridWord(const Matrix& cells, const auto& item) -> void {
+static inline auto printGridWord(const Matrix& cells, const auto& item)
+    -> void {
   if (DEBUG)
     log("item", item);
   else
