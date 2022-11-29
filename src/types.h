@@ -1,11 +1,13 @@
 #ifndef _TYPES_H
 #define _TYPES_H
 
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
-#include "env.h"
+
 #include "Cell.h"
+#include "env.h"
 
 using Matrix = std::vector<std::vector<Cell>>;
 using Seen = std::set<std::pair<int, int>>;

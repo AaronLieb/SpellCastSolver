@@ -75,6 +75,7 @@ void Solver::start() {
     Results results;
     bfs(cells, results);
 
+    utils::showTopNWithKReplacements(cells, results, 1, 4);
     utils::showTopNWithKReplacements(cells, results, 1, 3);
     utils::showTopNWithKReplacements(cells, results, 1, 2);
     utils::showTopNWithKReplacements(cells, results, 1, 1);

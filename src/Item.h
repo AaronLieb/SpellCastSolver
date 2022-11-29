@@ -41,7 +41,8 @@ struct Item {
   bool seen() const { return visited.count(pos); }
 };
 
-static std::ostream& operator<<(std::ostream& os, std::pair<smallint, smallint> p) {
+static std::ostream& operator<<(std::ostream& os,
+                                std::pair<smallint, smallint> p) {
   os << "(" << p.first << ", " << p.second << ")";
   return os;
 }
@@ -49,10 +50,11 @@ static std::ostream& operator<<(std::ostream& os, std::pair<smallint, smallint> 
 static std::ostream& operator<<(std::ostream& os, const Item& item) {
   os << "{"
      << "cword: " << item.cword << ", pos: "
-     << "(" << unsigned(item.pos.first) << ", " << unsigned(item.pos.second) << ")"
+     << "(" << unsigned(item.pos.first) << ", " << unsigned(item.pos.second)
+     << ")"
      << ", is_multi: " << item.is_multi
-     << ", replace_count: " << unsigned(item.replace_count) << ", value: " << item.value
-     << ", gems: " << unsigned(item.gems)
+     << ", replace_count: " << unsigned(item.replace_count)
+     << ", value: " << item.value << ", gems: " << unsigned(item.gems)
      << ", ivalue: " << (item.getInferredValue());
   os << ", visited: [";
   for (const auto& p : item.visited) {

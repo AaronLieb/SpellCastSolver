@@ -47,7 +47,7 @@ static inline auto printGridWord(const Matrix& cells, const auto& item)
   if (DEBUG)
     log("item", item);
   else
-    log(item.value, item.cword);
+    log(item.value, static_cast<int>(item.gems), item.cword);
 
   for (int r{}; r < cells.size(); ++r) {
     for (int c{}; c < cells[r].size(); ++c) {

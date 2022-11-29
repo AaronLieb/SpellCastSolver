@@ -11,8 +11,7 @@ def main():
     fd = open("given.txt", "w")
     lines = []
     for _ in range(kNUM_LINES):
-        r = choices(ascii_lowercase + ascii_lowercase +
-                    ascii_uppercase, k=kNUM_LINES)
+        r = choices(ascii_lowercase + ascii_lowercase + ascii_uppercase, k=kNUM_LINES)
         lines += "".join(r) + "\n"
 
     placed = set()
