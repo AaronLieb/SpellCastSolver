@@ -2,6 +2,7 @@
 #define _CLI_H
 
 #include <chrono>
+#include <cstring>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -11,25 +12,21 @@
 #include "types.h"
 
 namespace cli {
-template <typename T>
-inline void log(T msg) {
-  std::cout << msg << "\n";
-}
+template <typename T> inline void log(T msg) { std::cout << msg << "\n"; }
 
-template <typename T, typename... Ts>
-inline void log(T msg, Ts... rest) {
+template <typename T, typename... Ts> inline void log(T msg, Ts... rest) {
   std::cout << msg << " ";
   log(rest...);
 }
 
 inline void clearConsole() {
   /* TO-DO: make this portable (-nix, win, mac) */
-  system("clear");  // clear console window
+  system("clear"); // clear console window
 }
 
 namespace util {
 namespace style {
-const std::string green = "\u001b[32m";  // green
+const std::string green = "\u001b[32m"; // green
 const std::string bold = "\u001b[1m";
 const std::string black = "\u001b[30m";
 const std::string white_bg = "\u001b[47m";
@@ -40,9 +37,9 @@ const std::string black_bg = "\u001b[40;1m";
 const std::string reset = "\u001b[0m";
 const std::string red = "\u001b[31m";
 const std::string underline = "\u001b[4m";
-}  // namespace style
+} // namespace style
 
-static inline auto printGridWord(const Matrix& cells, const auto& item)
+static inline auto printGridWord(const Matrix &cells, const auto &item)
     -> void {
   if (DEBUG)
     log("item", item);
@@ -69,7 +66,8 @@ static inline auto printGridWord(const Matrix& cells, const auto& item)
       else if (cells[r][c].flag == TRIPLE)
         bg_color = style::white_bg;
 
-      if (cells[r][c].is_gem) bg_color += style::underline;
+      if (cells[r][c].is_gem)
+        bg_color += style::underline;
 
       std::cout << (DEBUG ? bg_color : style::black_bg);
       std::cout << (is_in_word ? color + style::bold : style::black) << chr
@@ -85,8 +83,7 @@ static inline auto showGiven(auto cells) -> void {
   printGridWord(cells, dummy);
 }
 
-template <typename TP>
-static std::time_t to_time_t(TP tp) {
+template <typename TP> static std::time_t to_time_t(TP tp) {
   using namespace std::chrono;
   auto sctp = time_point_cast<std::chrono::system_clock::duration>(
       tp - TP::clock::now() + std::chrono::system_clock::now());
@@ -103,7 +100,8 @@ inline auto getLastFileWriteTime() -> std::time_t {
 static auto checkRewrite() -> bool {
   static std::time_t last_write{-1};
   std::time_t curr_time = getLastFileWriteTime();
-  if (last_write == curr_time) return false;
+  if (last_write == curr_time)
+    return false;
   // cli::log("🚫 File Not Changed From Previous Run 🚫");
   last_write = curr_time;
   return true;
@@ -129,7 +127,7 @@ static auto busyCheckForRewrite() -> void {
   clearConsole();
 }
 
-}  // namespace util
+} // namespace util
 
 namespace debug {
 /*
@@ -137,26 +135,27 @@ namespace debug {
   source:
   stackoverflow.com/questions/32226300/make-variadic-macro-method-which-prints-all-variables-names-and-values
 */
-#define debug(...)                                                     \
-  do {                                                                 \
-    if (DEBUG) cli::debug::show(std::cout, #__VA_ARGS__, __VA_ARGS__); \
+#define debug(...)                                                             \
+  do {                                                                         \
+    if (DEBUG)                                                                 \
+      cli::debug::show(std::cout, #__VA_ARGS__, __VA_ARGS__);                  \
   } while (0);
 
 template <typename H1>
-std::ostream& show(std::ostream& out, const char* label, H1&& value) {
+std::ostream &show(std::ostream &out, const char *label, H1 &&value) {
   return out << label << "=" << std::forward<H1>(value) << '\n';
 }
 
 template <typename H1, typename... T>
-std::ostream& show(std::ostream& out, const char* label, H1&& value,
-                   T&&... rest) {
-  const char* pcomma = strchr(label, ',');
+std::ostream &show(std::ostream &out, const char *label, H1 &&value,
+                   T &&...rest) {
+  const char *pcomma = strchr(label, ',');
   return show(out.write(label, pcomma - label)
                   << "=" << std::forward<H1>(value) << ',',
               pcomma + 1, std::forward<T>(rest)...);
 }
-}  // namespace debug
+} // namespace debug
 
-}  // namespace cli
+} // namespace cli
 
 #endif
